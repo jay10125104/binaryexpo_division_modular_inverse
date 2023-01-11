@@ -1,67 +1,77 @@
-#include <bits/stdc++.h>
+/*
+K.D. Vinit  /,,/
+*/
+
+#include<bits/stdc++.h>
 using namespace std;
 
 #define int long long
-int mod = 1e9 + 7;
-int Highest = 1e6;
+#define endl "\n"
 
-//---------------Mod_Multiplication-------------------//
+const int mod = 1e9 + 7;
+const int Fact_Length = 2e5 + 100;     //Max length
 
-int mod_mul(int a, int b)
+//Takes a&b as input and Returns : The power (a,b), (a^b)%mod
+int Power(int base, int expo)
 {
-    a = a % mod;
-    b = b % mod;
-    return (((a * b) % mod) + mod) % mod;
+   int result=1; base%=mod;
+   while(expo) {   if(expo%2==1)  result=(result*base)%mod;     base=(base*base)%mod;     expo/=2; }
+   return result;
 }
 
-//-------------------Factorial------------------------//
+// It give the modulo inverse of a, (1/a)%mod
+int Mod_Inv(int aa) { return Power(aa,mod-2); }
 
-int *fact;
-void calFact()
+int Factorial[Fact_Length];
+// It make the above Factorial[i] = i! array
+int Make_Factorial()
 {
-    fact = new int[Highest];
-    fact[0] = 1;
-    fact[1] = 1;
-    for (int i = 2; i < Highest; i++)
-        fact[i] = mod_mul(fact[i - 1], i);
+   Factorial[0]=1;
+   for(int i=1;i<Fact_Length;i++) { Factorial[i]=(i*Factorial[i-1])%mod; } return 0;
+}
+int Implement_Make_Factorial=Make_Factorial();      //To Implement Make_Factorial
+
+// Takes n&r as input and Returns : nCr%mod
+int nCr(int nn,int rr)
+{
+   if(nn<rr || nn<0 || rr<0) return 0;
+   //if(>Fact_Length) { cout<<"Error"<<endl; return; }
+   int fans=(Factorial[nn]*Mod_Inv(Factorial[rr]))%mod;
+   fans=(fans*Mod_Inv(Factorial[nn-rr]))%mod;
+   return fans;
 }
 
-int myPow(int a, int b)
+int calc(int x1, int y1, int x2, int y2)
 {
-    int ans = 1;
-    while (b)
-    {
-        if (b & 1)
-            ans = ans * a % mod;
-        b >>= 1;
-        a = (a * a) % mod;
-    }
-    return ans % mod;
+    int r = x2-x1;
+    int d = y2-y1;
+    int ans = nCr(r+d, r);
+    return ans;
 }
 
-int my(int n, int m)
+void solve()
 {
-    if (m == 0 || m == n)
-        return 1;
-    int res = fact[n];
-    res = res * myPow(fact[m], mod - 2) % mod;
-    res = res * myPow(fact[n - m], mod - 2) % mod;
-    return res;
-}
-
-signed main()
-{
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
     int h, w, a, b;
-    cin >> h >> w >> a >> b;
-    calFact();
-    int r = 0, ans = 0;
-    for (int i = b + 1; i <= w; i++)
+    cin>>h>>w>>a>>b;
+
+    a=h-a+1;
+
+    int ans=0;
+    for(int i=1; i<a; i++)
     {
-        r = my(i - 1 + h - a - 1, h - a - 1) * my(a - 1 + w - i, a - 1) % mod;
-        ans = (ans % mod + r % mod) % mod;
+        int cur = (calc(1, 1, i, b)*calc(i, b+1, h, w))%mod;
+        // (1,1)->(ith row,bth column) * (i,b+1,h,w);
+        ans = (ans+cur)%mod;
     }
-    cout << ans << endl;
+
+    if(ans<0) ans+=mod;
+
+    cout<<ans<<endl;
+}
+
+int32_t main()
+{
+    ios_base::sync_with_stdio(false);cin.tie(0);cout.tie(0);
+    solve();
     return 0;
 }
