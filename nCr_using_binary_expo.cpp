@@ -61,6 +61,15 @@ void factorial(){
         fact[i]=ans;
     }
 }
+long long int ans(int n,int r){
+    long long int n_r=n-r;
+//     factorial();
+    long long int n_r_inverse = binaryexpo(fact[n_r],m-2);
+    long long int r_inverse = binaryexpo(fact[r],m-2); // fermit theorem to find inverse
+    long long int sol = ((fact[n]%m)*(n_r_inverse%m))%m;
+    sol = ((sol%m)*(r_inverse%m))%m;
+    return sol;
+}
 int main(){
     long long int n;
     cin>>n;
